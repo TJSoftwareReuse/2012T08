@@ -14,26 +14,26 @@ import java.util.Random;
 import java.util.TimerTask;
 import java.util.Timer;
 
+import org.omg.CORBA.PRIVATE_MEMBER;
 
 public class PM {
-	
+	//每次执行发送信息函数的时候修改一次log文件 对于时间开销比较大，但保证了每条消息都能保存到文件中
 	private static class SingletonHolder     
 	{     
-			public static int Interval=60;
-	        public final static Map<String, Integer> instance = new HashMap<String,Integer>();
-	        public static Timer time=new Timer();
+			public final static Map<String, Integer> instance = new HashMap<String,Integer>();
 	        public static String lastFileName=getFileName(-1);
 	}
-	public static String getFileName(int moreMinute) {
+	private static String getFileName(int moreMinute) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(Calendar.MINUTE,moreMinute);
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
 		return dateFormat.format(calendar.getTime())+".log";
 	}
-	//发送消息方法  value 可以为负数
+	//发送消息方法  value 可以为负数或0  负数不被添加到系统
 	public synchronized static void sendPMMessage(String name,int value)
 	{
-		System.out.println("send");
+		//System.out.println("send");
+		
 		if(value<0)return;
 		String FileName=getFileName(0);
 		File file=new File(FileName);
@@ -48,7 +48,7 @@ public class PM {
 		else {
 			SingletonHolder.lastFileName=FileName;
 			SingletonHolder.instance.clear();
-			System.out.println("clear");
+		//	System.out.println("clear");
 			SingletonHolder.instance.put(name, value);
 			try {
 				file.createNewFile();
@@ -57,12 +57,12 @@ public class PM {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("output:"+SingletonHolder.instance.size());
+		//System.out.println("output:"+SingletonHolder.instance.size());
 		output(file);
 	}
-	//输出到项目文件下以 年-月-日-时-分  命名  如果可输出内容为空，则取消输出
-	public static synchronized void output(File file) {
-		System.out.println("output");
+	//将保存的信息全部 输出到项目文件下     
+	private static synchronized void output(File file) {
+	//	System.out.println("output");
 		FileOutputStream out;
 		try {
 			out = new FileOutputStream(file);
