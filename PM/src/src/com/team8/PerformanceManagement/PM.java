@@ -16,13 +16,14 @@ import java.util.Timer;
 
 import org.omg.CORBA.PRIVATE_MEMBER;
 
+import com.sun.org.glassfish.external.statistics.annotations.Reset;
+
 public class PM {
 	//每次执行发送信息函数的时候修改一次log文件 对于时间开销比较大，但保证了每条消息都能保存到文件中
 	private PM()
 	{
 		
 	}
-
 	private static class SingletonHolder     
 	{     
 			public final static Map<String, Integer> instance = new HashMap<String,Integer>();
@@ -85,6 +86,14 @@ public class PM {
 	public static Map<String, Integer> getMap()
 	{
 		return SingletonHolder.instance;	
+	}
+	public static void Reset()
+	{
+		SingletonHolder.instance.clear();
+		File lastFile=new File(SingletonHolder.lastFileName);
+		if(lastFile.exists())
+			lastFile.delete();
+		SingletonHolder.lastFileName=getFileName(-1);
 	}
 }
 
