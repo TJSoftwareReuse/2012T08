@@ -25,11 +25,42 @@ import org.junit.Test;
 
 public class PMTest {
 
-	
+	//多线程测试类
+		public class testThread extends Thread
+		{
+			@Override
+			public void run()
+			{
+				int times=5;
+				while(times>0)
+				{
+					times--;
+					try {
+						sleep(30);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					PM.sendPMMessage("TestThread", 1);
+				}
+				
+			}
+		}
 	@Before
 	public void setUp() throws Exception {
 	}
-
+	@Test
+	public void testReset()
+	{
+		PM.Reset();
+		PM.sendPMMessage("a", 22);
+		String FileName=PM.getFileName(0);
+		File file=new File(FileName);
+		PM.Reset();
+		assertFalse(file.exists());
+	}
+	
 	@Test
 	// 测试正常情况,0分钟延迟
 	public void testGetFileNameNormal() {
@@ -45,9 +76,9 @@ public class PMTest {
 		Date date = new Date();
 		Calendar dar = Calendar.getInstance();
 		dar.setTime(date);
-		dar.add(Calendar.MINUTE, 20);
+		dar.add(Calendar.HOUR, 2);
 		String FileName = dft.format(dar.getTime())+".log";
-		String result = PM.getFileName(20);
+		String result = PM.getFileName(120);
 		assertEquals(FileName,result);
 	}
 
@@ -71,7 +102,6 @@ public class PMTest {
 			assertEquals(true,tempMap.containsKey("Alice"));
 			assertEquals(new Integer(10),tempMap.get("Alice"));
 		}
-		
 	}
 
 	@Test
@@ -114,34 +144,17 @@ public class PMTest {
 		assertTrue(target.exists());
 		
 		try {
-			BufferedReader bf=new BufferedReader(new FileReader(target));
+			FileReader fr=new FileReader(target);
+			BufferedReader bf=new BufferedReader(fr);
 			String FirstLine=bf.readLine();
 			assertEquals(FirstLine, "TestThread:20");
+			bf.close();
+			fr.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
+
 	}
-	//多线程测试类
-	public class testThread extends Thread
-	{
-		@Override
-		public void run()
-		{
-			int times=5;
-			while(times>0)
-			{
-				times--;
-				try {
-					sleep(30);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				PM.sendPMMessage("TestThread", 1);
-			}
-			
-		}
-	}
+
 }
