@@ -10,15 +10,12 @@ public class License {
 	private int count = 0; 
 	//do this function when check
 	public boolean inLicense(){
+		count ++;
 		if((license != 0) && (count < license)){
 			return true;
 		}
 		else
 			return false;
-	}
-	//do this function when count
-	public void click(){
-		count ++;
 	}
 	//set your license
 	public void setlicense(int license){
