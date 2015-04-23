@@ -1,4 +1,4 @@
-package com.team8.PerformanceManagement;
+package src.com.team8.PerformanceManagement;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,12 +18,17 @@ import org.omg.CORBA.PRIVATE_MEMBER;
 
 public class PM {
 	//每次执行发送信息函数的时候修改一次log文件 对于时间开销比较大，但保证了每条消息都能保存到文件中
+	private PM()
+	{
+		
+	}
+
 	private static class SingletonHolder     
 	{     
 			public final static Map<String, Integer> instance = new HashMap<String,Integer>();
 	        public static String lastFileName=getFileName(-1);
 	}
-	private static String getFileName(int moreMinute) {
+	public static String getFileName(int moreMinute) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(Calendar.MINUTE,moreMinute);
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
@@ -76,6 +81,10 @@ public class PM {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
+	}
+	public static Map<String, Integer> getMap()
+	{
+		return SingletonHolder.instance;	
 	}
 }
 

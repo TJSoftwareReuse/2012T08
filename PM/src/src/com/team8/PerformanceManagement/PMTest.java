@@ -1,4 +1,4 @@
-package com.team8.PerformanceManagement;
+package src.com.team8.PerformanceManagement;
 
 import static org.junit.Assert.*;
 
@@ -12,9 +12,10 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+
 public class PMTest {
 
-	PM p = new PM();
+	
 	@Before
 	public void setUp() throws Exception {
 	}
@@ -34,27 +35,40 @@ public class PMTest {
 		Date date = new Date();
 		Calendar dar = Calendar.getInstance();
 		dar.setTime(date);
-		dar.add(java.util.Calendar.HOUR_OF_DAY, 2);
-		dft.format(dar.getTime());
-
-		String result = PM.getFileName(120);
-		assertEquals(dft + ".log", result);
+		dar.add(Calendar.MINUTE, 20);
+		String FileName = dft.format(dar.getTime())+".log";
+		String result = PM.getFileName(20);
+		assertEquals(FileName,result);
 	}
 
 	@Test
 	public void testSendPMMessage() {
-		p.sendPMMessage("Alice", 12);
-	//	Map<String, Integer> tmp = new HashMap<String,Integer>();
-	//	tmp.put("Alice", 12);
-		assertEquals(12,p.forTest());
+		String FileName=PM.getFileName(0);
+		PM.sendPMMessage("Alice", 12);
+		Map<String, Integer> tempMap=PM.getMap();
+		assertEquals(true,tempMap.containsKey("Alice"));
+		assertEquals(new Integer(12),tempMap.get("Alice"));
+		
+		PM.sendPMMessage("Alice", 10);
+		PM.sendPMMessage("Bob", 10);
+		tempMap=PM.getMap();
+		if (PM.getFileName(0).equals(FileName)) {
+			assertEquals(true,tempMap.containsKey("Alice"));
+			assertEquals(new Integer(22),tempMap.get("Alice"));
+		}
+		else{
+			assertEquals(true,tempMap.containsKey("Alice"));
+			assertEquals(new Integer(10),tempMap.get("Alice"));
+		}
+		
 	}
 
 	@Test
 	//通过检查文件是否存在来测试void方法
 	public void testOutputNormal() {
 		int tmp = 0;
-		p.sendPMMessage("Loki", 18);
-		File target = new File(p.getFileName(0));
+		PM.sendPMMessage("Loki", 18);
+		File target = new File(PM.getFileName(0));
 		if(target.exists())
 		{
 			tmp = 1;
