@@ -154,20 +154,20 @@ public class PM {
 	 * 返回该分钟内收到的信息
 	 * <p>
 	 * 重置该类
-	 * 清空该分钟的输出记录
+	 * 清空上一次的输出记录
 	 * 该方法是为了方便测试人员进行测试
 	 * <p>
-	 * @param null
+	 * @param Minute  删除Minute时间后的文件   小于0表示之前写入的文件
 	 * @return  null
 	 */
-	public static void Reset()
+	public static void Reset(int Minute)
 	{
 		if(SingletonHolder.isReset==false)
 		{
 			SingletonHolder.isReset=true;
 			System.gc();//为了保证文件能够正常删除，需要这个函数
 			SingletonHolder.instance.clear();
-			File lastFile=new File(getFileName(0));
+			File lastFile=new File(getFileName(Minute));
 			if(lastFile.exists())
 				lastFile.delete();
 			SingletonHolder.lastFileName=getFileName(-1);

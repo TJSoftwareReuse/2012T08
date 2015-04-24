@@ -36,11 +36,11 @@ public class PMTest extends TestCase{
 	@Test
 	public void testReset()
 	{
-		PM.Reset();
+		PM.Reset(0);
 		PM.sendPMMessage("a", 22);
 		String FileName=PM.getFileName(0);
 		File file=new File(FileName);
-		PM.Reset();
+		PM.Reset(0);
 		assertFalse(file.exists());
 		assertTrue(PM.getMap().isEmpty());
 	}
@@ -53,7 +53,7 @@ public class PMTest extends TestCase{
 	// 测试时间超过一个小时的情况
 	@Test
 	public void testGetFileNameMore() {
-		PM.Reset();
+		PM.Reset(0);
 		SimpleDateFormat dft = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
 		Date date = new Date();
 		Calendar dar = Calendar.getInstance();
@@ -66,16 +66,16 @@ public class PMTest extends TestCase{
 
 	@Test
 	public void testSendPMMessage() {
-		PM.Reset();
+		PM.Reset(0);
 		PM.sendPMMessage("Alice", 12);
 		Map<String, Integer> tempMap=PM.getMap();
 		assertEquals(true,tempMap.containsKey("Alice"));
 		assertEquals(new Integer(12),tempMap.get("Alice"));
-		PM.Reset();
+		PM.Reset(0);
 	}
 	@Test
 	public void testSendMorePMMessage() {
-		PM.Reset();
+		PM.Reset(0);
 		PM.sendPMMessage("Alice", 12);
 		PM.sendPMMessage("Bob", 10);
 		PM.sendPMMessage("Alice", 10);
@@ -84,11 +84,11 @@ public class PMTest extends TestCase{
 		assertEquals(new Integer(22),tempMap.get("Alice"));
 		assertEquals(true,tempMap.containsKey("Bob"));
 		assertEquals(new Integer(10),tempMap.get("Bob"));
-		PM.Reset();
+		PM.Reset(0);
 	}
 	@Test
 	public void testSendErrorPMMessage() {
-		PM.Reset();
+		PM.Reset(0);
 		PM.sendPMMessage("error", -1);
 		String FileName=PM.getFileName(0);
 		File file=new File(FileName);
@@ -96,12 +96,11 @@ public class PMTest extends TestCase{
 		
 		PM.sendPMMessage(null, -1);
 		assertFalse(file.exists());
-		
 	}
 	@Test
 	//通过读取log文件测试输出效果
 	public void testOutputNormal() {
-		PM.Reset();
+		PM.Reset(0);
 		PM.sendPMMessage("Loki", 18);
 		PM.sendPMMessage("MMM", 17);
 		PM.sendPMMessage("Loki", 1000);
@@ -124,12 +123,12 @@ public class PMTest extends TestCase{
 	@Test
 	public void testMutiThread() throws InterruptedException
 	{
-		PM.Reset();
+		PM.Reset(0);
 		int threadNum=1000;
 		CountDownLatch runningThreadNum = new CountDownLatch(threadNum);
 		for(int i=0;i<threadNum;i++)
 		{
-			new testThread(runningThreadNum).start();
+			new testThread(runningThreadNum,300).start();
 		}
 		runningThreadNum.await();
 		
@@ -142,22 +141,65 @@ public class PMTest extends TestCase{
 			assertEquals(FirstLine, "TestThread:"+threadNum*5);
 			bf.close();
 			fr.close();
-			PM.Reset();
+			PM.Reset(0);
 			assertFalse(target.exists());
 			assertTrue(PM.getMap().isEmpty());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	
+		}finally{
+			PM.Reset(0);
+		}
 		
+	}
+	//多线程测试 压力测试1000个线程 每个线程写5次
+	@Test
+	public void testMutiThreadOverMinute() throws InterruptedException
+	{
+		PM.Reset(0);
+		int threadNum=100;
+		CountDownLatch runningThreadNum = new CountDownLatch(threadNum);
+		for(int i=0;i<threadNum;i++)
+		{
+			new testThread(runningThreadNum,12000).start();
+		}
+		runningThreadNum.await();
+		File target1 = new File(PM.getFileName(-1));
+		File target2 = new File(PM.getFileName(0));
+		assertTrue(target1.exists());
+		assertTrue(target2.exists());
+		try {
+			FileReader fr=new FileReader(target1);
+			BufferedReader bf=new BufferedReader(fr);
+			String FirstLine=bf.readLine();
+			bf.close();
+			fr.close();
+			fr=new FileReader(target2);
+			bf=new BufferedReader(fr);
+			String SecondLine=bf.readLine();
+			int m1=Integer.parseInt((FirstLine.split(":"))[1]);
+			int m2=Integer.parseInt((SecondLine.split(":"))[1]);
+			assertEquals(m1+m2, threadNum*5);
+			bf.close();
+			fr.close();
+			
+		} catch (IOException e) {
+				// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally{
+			PM.Reset(0);
+			PM.Reset(-1);
+		}
 	}
 	//多线程测试类
 	public class testThread extends Thread
 	{
 		CountDownLatch runingNum;
-		public testThread(CountDownLatch runingNum) {
+		int sleeptime=300;
+		public testThread(CountDownLatch runingNum,int sleep) {
 			// TODO Auto-generated constructor stub
 			this.runingNum=runingNum;
+			sleeptime=sleep;
 		}
 		@Override
 		public void run()
@@ -167,7 +209,7 @@ public class PMTest extends TestCase{
 			{
 				times--;
 				try {
-					sleep(300);
+					sleep(sleeptime);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
