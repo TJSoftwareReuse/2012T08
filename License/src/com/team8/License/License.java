@@ -49,12 +49,4 @@ public class License {
 	public int getLicense(){
 		return license;
 	}
-	/**
-	 * 获得License总数
-	 * <p>
-	 * 不支持多线程
-	 * 
-	 * @return int  License总数量(初始值)
-	 *  
-	 **/
 }
