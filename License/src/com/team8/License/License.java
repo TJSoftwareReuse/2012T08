@@ -32,8 +32,9 @@ public class License {
 	 *  
 	 **/
 	public synchronized boolean inLicense(){
+		
+	if((license != 0) && (count < license)){
 		count ++;
-	if((license != 0) && (count <= license)){
 		return true;
 	}
 	else
@@ -48,5 +49,9 @@ public class License {
 	 **/
 	public int getLicense(){
 		return license;
+	}
+	public int getRemain()
+	{
+		return license-count;
 	}
 }
