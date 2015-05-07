@@ -1,18 +1,45 @@
-#���ǵ��Ҷ�Ա��ŵ���Ŀ
+#我们的找队员编号的项目
 
-1. ��������û�ͬʱ����server û�����̶߳�ͬ�����в��ԣ����Բ�������᲻����ڶ��̵߳�����
-	����Ҫ������Ա���в���
-2. CM���ļ�·�������� ".\CMRoot\config.properties"
-3. PM���ļ�·�������� ".\PMRoot\"
-4. FM���ļ�������Ϊ".\FMRoot"
-5. LicenseNum�趨Ϊ5����������server��ʱ�򣬲���CM���ݽ��и���
-6. ����û�����ͬһ��License
-7. ���ѧ���������ڣ����صĶ������Ϊnull
-8. �˿ں�Ϊ8080��ipΪ����ip ��127.0.0.1
-9. �ڿͻ������� "END" �����ͻ��ˣ�ֻ��ͨ���ֶ����������
+1. 允许多个用户同时访问server 没开过线程对同步进行测试，所以并不清楚会不会存在多线程的问题
+	则需要测试人员进行测试
+2. CM的文件路径设置在 ".\CMRoot\config.properties"
+3. PM的文件路径设置在 ".\PMRoot\"
+4. FM的文件名设置为".\FMRoot"
+5. LicenseNum设定为5，并且启动server的时候，不对CM数据进行更改
+6. 多个用户共享同一个License
+7. 如果学生名不存在，返回的队伍号码为null
+8. 端口号为8080，ip为本机ip ：127.0.0.1
+9. 在客户端输入 "END" 结束客户端，只能通过手动结束服务端
 
-#�����Ǽ򵥲��Խ��棺
+#以下是简单测试界面：
 
-* ͨ�����������ͻ��ˣ��Է�����ͬʱ���з��ʣ��õ��Ĳ�ͬ�Ľ��
-* ͼƬ������picture�ļ�����
+* 通过开启三个客户端，对服务器同时进行访问，得到的不同的结果
+* 图片保存在picture文件夹下
 
+server端的输出
+
+<img alt="server端的输出" src="https://github.com/TJSoftwareReuse/2012T08/blob/master/Project_get_Team_Num/reuse_server/Picture_For_Project/MainServer.png" >
+
+Client1端输入与输出(蓝色表示输入)
+
+<img alt="Client1" src="https://github.com/TJSoftwareReuse/2012T08/blob/master/Project_get_Team_Num/reuse_server/Picture_For_Project/MainClient1.png">
+
+Client2端输入与输出(蓝色表示输入)
+
+<img alt="Client1" src="https://github.com/TJSoftwareReuse/2012T08/blob/master/Project_get_Team_Num/reuse_server/Picture_For_Project/MainClient2.png" >
+
+Client3端输入与输出(蓝色表示输入)
+
+<img alt="Client1" src="https://github.com/TJSoftwareReuse/2012T08/blob/master/Project_get_Team_Num/reuse_server/Picture_For_Project/MainClient3.png" >
+
+
+##额外的设想
+
+可以添加的功能
+
+	1. 管理员登录功能，
+	2. 修改License功能
+	3. 关闭server后保存剩余License数量作为新的配置参数
+	4. 管理员修改License功能
+
+以上功能只是瞎想想，我不做。
