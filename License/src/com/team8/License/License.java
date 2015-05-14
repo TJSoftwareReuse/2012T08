@@ -1,6 +1,6 @@
 
 
-package src.com.team8.License;
+package com.team8.License;
 /**
  * License.java
  * @author  team8
@@ -9,12 +9,12 @@ public class License {
 	private int license = 0;
 	private int count = 0; 
 	/**
-	 * ¹¹Ôìº¯Êı
+	 * æ„é€ å‡½æ•°
 	 * 
 	 * <p>
-	 * ¹¹Ôìº¯Êı£¬³õÊ¼»¯LicenseÊıÁ¿
+	 * æ„é€ å‡½æ•°ï¼Œåˆå§‹åŒ–Licenseæ•°é‡
 	 * 
-	 * @param License ³õÊ¼»¯LicenseÊıÁ¿
+	 * @param License åˆå§‹åŒ–Licenseæ•°é‡
 	 *  
 	 **/
 	public License(int License) {
@@ -22,13 +22,13 @@ public class License {
 		this.license=License;
 	}
 	/**
-	 * ÅĞ¶ÏÊÇ·ñ»¹ÓĞLicense
+	 * åˆ¤æ–­æ˜¯å¦è¿˜æœ‰License
 	 * <p>
-	 * ÅĞ¶ÏÊÇ·ñ»¹ÓĞLicense
-	 * Èç¹ûÃ»ÓĞLicense ·µ»ØFalse ·ñÔòLicense¼õÉÙÒ»¸ö¡£
+	 * åˆ¤æ–­æ˜¯å¦è¿˜æœ‰License
+	 * å¦‚æœæ²¡æœ‰License è¿”å›False å¦åˆ™Licenseå‡å°‘ä¸€ä¸ªã€‚
 	 * <p>
-	 * Ö§³Ö¶àÏß³Ì
-	 * @return boolean  licenseÊÇ·ñ»¹ÓĞÊ£Óà True±íÊ¾»ñµÃĞí¿É
+	 * æ”¯æŒå¤šçº¿ç¨‹
+	 * @return boolean  licenseæ˜¯å¦è¿˜æœ‰å‰©ä½™ Trueè¡¨ç¤ºè·å¾—è®¸å¯
 	 *  
 	 **/
 	public synchronized boolean inLicense(){
@@ -41,10 +41,10 @@ public class License {
 		return false;
 	}
 	/**
-	 * »ñµÃLicense×ÜÊı
+	 * è·å¾—Licenseæ€»æ•°
 	 * <p>
 	 * 
-	 * @return int  License×ÜÊıÁ¿(³õÊ¼Öµ)
+	 * @return int  Licenseæ€»æ•°é‡(åˆå§‹å€¼)
 	 *  
 	 **/
 	public int getLicense(){
