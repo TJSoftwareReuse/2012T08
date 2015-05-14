@@ -1,4 +1,4 @@
-package src.com.team8.PerformanceManagement;
+package com.team8.PerformanceManagement;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,6 +36,8 @@ public class PM {
 			public final static Map<String, Integer> instance = new HashMap<String,Integer>();
 	        public static String lastFileName=getFileName(-1);
 	        public static boolean isReset=false;
+	        public static String pathName = "LOG";
+	        public static String spilt=System.getProperty("file.separator");
 	}
 	/**
 	 * 根骨时间获得要写入的文件名
@@ -51,8 +53,21 @@ public class PM {
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(Calendar.MINUTE,moreMinute);
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
-		return "LOG\\"+dateFormat.format(calendar.getTime())+".log";
+		 
+		return SingletonHolder.pathName+SingletonHolder.spilt+dateFormat.format(calendar.getTime())+".log";
+		
 	}
+	
+	public static void setPathName(String pathName)
+	{
+		if(pathName!=""&&pathName!=null)
+			SingletonHolder.pathName=pathName;
+	}
+	public static String getPathName()
+	{
+		return SingletonHolder.pathName;
+	}
+	
 	/**
 	 * 发送PM信息
 	 * <p>
@@ -81,7 +96,7 @@ public class PM {
 		if(value<=0)return;
 		String FileName=getFileName(0);
 		File file=new File(FileName);
-		//System.out.println("send");
+
 		try {
 			if(!file.getParentFile().exists())
 			{	
@@ -100,7 +115,7 @@ public class PM {
 				SingletonHolder.instance.clear();
 				SingletonHolder.instance.put(name, value);
 				file.createNewFile();
-				System.out.println(FileName+" be created");
+
 			}
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
