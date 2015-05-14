@@ -78,6 +78,7 @@ public class Server {
 				while(true){  
 					String str;
 					str = br.readLine();
+					
 					if(str.equals("END")){  
 						break;  
 					}

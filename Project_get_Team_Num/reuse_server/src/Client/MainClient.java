@@ -29,18 +29,24 @@ public class MainClient {
 	          //同服务器原理一样  
 	          br = new BufferedReader(new InputStreamReader(  
 	                  socket.getInputStream()));  
+	          
 	          pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(  
 	                  socket.getOutputStream())));  
 	          Scanner scanner = new Scanner(System.in);  
-	          String m;
-	          do
+	          String m="";
+	          
+	          while(!m.equals("END"))
 	          {
-	        	  m=scanner.nextLine();
+	        	  System.out.println(m);
+	        	  m=scanner.nextLine();  
 	        	  pw.println(m);
 	        	  pw.flush();
+	        	  if(m.equals("END"))
+	        		  break;
 	        	  System.out.println(br.readLine());
 	        	  System.out.println(br.readLine());
-	          }while(m!="END");
+	          }
+	          scanner.close();
 	      } catch (Exception e) {  
 	          e.printStackTrace();  
 	      } finally {  
@@ -49,6 +55,7 @@ public class MainClient {
 	              br.close();  
 	              pw.close();  
 	              socket.close();  
+	              
 	          } catch (IOException e) {  
 	              e.printStackTrace();  
 	          }  
