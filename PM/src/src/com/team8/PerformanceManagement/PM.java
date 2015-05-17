@@ -16,7 +16,7 @@ import java.util.Timer;
 
 import org.omg.CORBA.PRIVATE_MEMBER;
 
-
+import com.sun.org.glassfish.external.statistics.annotations.Reset;
 /**
  * @author      Group_8_Tongji_University <https://github.com/TJSoftwareReuse/2012T08>
  * @since       2015-04-24
@@ -26,6 +26,7 @@ public class PM {
 	 * 这是一个单例，不提供单独的构造函数
 	 * It's a Singleton and won't provide Constructor
 	 * Please use PM directly
+	 * @return            null
 	 */
 	private PM()
 	{
@@ -45,7 +46,7 @@ public class PM {
 	 * <p>
 	 *
 	 * @param   moreMinute   获得moreMinute时间后要输出的文件名
-	 * @return  filename  moreMinute时间后要输出的文件名
+	 * @return  String(filename)  moreMinute时间后要输出的文件名
 	 */
 	public static String getFileName(int moreMinute) {
 		Calendar calendar = Calendar.getInstance();
@@ -72,9 +73,10 @@ public class PM {
 	 * <p>
 	 * 每次调用该函数，即时输出到文件，确保程序尽可能输出PM信息
 	 * <p>
-	 * @param  name   PM信息的字符描述
-	 * @param  value    PM信息的输出次数     value>0
-	 * @exception  IOException  
+	 * @param  String(name)   PM信息的字符描述
+	 * @param  int(value)     PM信息的输出次数     value>0
+	 * @exception  IOException
+	 * @return  null   
 	 */
 	public synchronized static void sendPMMessage(String name,int value)
 	{
@@ -140,6 +142,7 @@ public class PM {
 	 * 将类内部保存的信息通过Map方式返回
 	 * 该方法是为了方便测试人员进行测试
 	 * <p>
+	 * @param null
 	 * @exception IOException
 	 * @return  Map  PM信息和输出次数的对应表
 	 */
@@ -154,6 +157,8 @@ public class PM {
 	 * 清空该分钟的输出记录
 	 * 该方法是为了方便测试人员进行测试
 	 * <p>
+	 * @param null
+	 * @return  null
 	 */
 	public static void Reset()
 	{
