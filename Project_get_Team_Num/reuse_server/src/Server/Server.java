@@ -8,8 +8,10 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Scanner;
 
 import javax.naming.InitialContext;
 
@@ -23,7 +25,7 @@ public class Server {
 	public static int PORT = 8080;  
 	public static String CMRoot="CMRoot\\config.properties";
 	public static License license;
-	
+	public static String encode="Unicode";
 	public static void InitWithCM()
 	{
 		ConfigUtil.getInstance();
@@ -44,6 +46,8 @@ public class Server {
 	        //设定服务端的端口号  
 	        s = new ServerSocket(PORT);  
 	        System.out.println("ServerSocket Start:"+s);  
+	        ServerThread_local stl=new ServerThread_local();
+	        stl.start();
 	        //等待请求,此方法会一直阻塞,直到获得请求才往下走  
 	        while(true){
 	        	socket = s.accept(); 
@@ -57,6 +61,37 @@ public class Server {
 	    }finally{  
 	    	System.out.println("Close.....");       
 	    }  
+	}
+	public class ServerThread_local extends Thread{
+		@Override
+		public void run() {
+			BufferedReader br=null;
+
+			Scanner scanner = new Scanner(System.in);  
+			while(true)
+			{
+				String m=scanner.nextLine();  
+				ProvideService(m);
+			}
+		}
+		private void ProvideService(String str) {
+			PM.sendPMMessage("get Message "+str, 1);
+			if(license.inLicense())
+			{
+				FailureManager.logDebug("Provide Service Success");
+				PM.sendPMMessage("Provide Service"+str, 1);
+				PM.sendPMMessage("Return Message", 1);
+				System.out.println("Student: "+str+" belong to team: "+ConfigUtil.getInstance().getProperty(str));
+				
+			}
+			else {
+				FailureManager.logDebug("Provide Service Fail");
+				PM.sendPMMessage("Reject Service"+str, 1);
+				PM.sendPMMessage("Return Message", 1);
+				System.out.println("Reject Service");
+				
+			}
+		}
 	}
 	public class ServerThread extends Thread{
 		private Socket socket=null;
@@ -72,9 +107,9 @@ public class Server {
 			{
 				System.out.println("Connection accept socket:"+socket);   
 				//用于接收客户端发来的请求         
-				br = new BufferedReader(new InputStreamReader(socket.getInputStream()));  
+				br = new BufferedReader(new InputStreamReader(socket.getInputStream(),encode));  
 				//用于发送返回信息,可以不需要装饰这么多io流使用缓冲流时发送数据要注意调用.flush()方法   
-				pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())),true);  
+				pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(),encode)),true);  
 				while(true){  
 					String str;
 					str = br.readLine();

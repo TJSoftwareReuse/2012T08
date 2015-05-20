@@ -28,10 +28,10 @@ public class MainClient {
 	          System.out.println("Socket=" + socket);  
 	          //同服务器原理一样  
 	          br = new BufferedReader(new InputStreamReader(  
-	                  socket.getInputStream()));  
+	                  socket.getInputStream(),Server.encode));  
 	          
 	          pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(  
-	                  socket.getOutputStream())));  
+	                  socket.getOutputStream(),Server.encode)));  
 	          Scanner scanner = new Scanner(System.in);  
 	          String m="";
 	          
