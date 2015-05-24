@@ -36,11 +36,10 @@ public class MainClientTest {
 	// 全局变量
 	public static String CMRoot = "CMRoot\\config.properties";
 	public static License license;
+	public volatile static int myTimer = 1000;
 	
 	//所有线程公用一个License的个数
-	public volatile int license_num = InitWithCM();	 
-	
-
+	public volatile static int license_num = InitWithCM();	 
 
 	//初始化license，为了得到license的个数
 	public static int InitWithCM() {
@@ -65,6 +64,7 @@ public class MainClientTest {
 
 		// 构造一个Runner
 		TestRunnable runner = new TestRunnable() {
+			@SuppressWarnings("deprecation")
 			@Override
 			public void runTest() throws Throwable {
 				// 测试内容
@@ -73,27 +73,35 @@ public class MainClientTest {
 				PrintWriter pw = null;
 				
 				//每个线程单独进行下列测试
-				String[] test_str = {"123",		//测试输入为数字时；
-									"",			//测试输入为空时；
-									"杨丰",        //测试输入为存在的同学；
-									"周杰伦",    //测试输入为不存在的同学；
-									"END"};      //测试结束指令
+				String[] test_str = {"4",		//测试输入为正常组号；
+									"",			//测试输入为空；
+									"555",     //测试输入为不存在的组号；
+									"aaabb",   //测试输入为字母；
+									"END"};     //测试结束指令
 				
 				try {
 					socket = new Socket("127.0.0.1", Server.PORT);
 					br = new BufferedReader(new InputStreamReader(
-							socket.getInputStream()));
+							socket.getInputStream(),Server.encode));
 					pw = new PrintWriter(new BufferedWriter(
-							new OutputStreamWriter(socket.getOutputStream())));
+							new OutputStreamWriter(socket.getOutputStream(),Server.encode)));
+					
+					//多线程运行时让每个线程之间间隔0.5s，避免出现license数目错误问题
+					myTimer += 500;
+					try {
+						Thread.sleep(myTimer);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 					for (int i = 0; i < test_str.length; ++i) {
-						pw.println(test_str[i]);
+						pw.println(test_str[i]);	//会自动给字符串加上换行符号
 						pw.flush();
 						br.readLine();	//这一行代码将“Message Received”跳过
 						switch (i) {
 						case 0:
 							if( license_num > 0)
 							{
-								assertEquals("Student: 123 belong to team: null",
+								assertEquals("Team: 4 has student: 梁竞文:彭秋辰:胡文超:杨爽",
 									br.readLine());
 								license_num -= 1;
 							}
@@ -120,7 +128,7 @@ public class MainClientTest {
 						case 2:
 							if(license_num > 0)
 							{
-									assertEquals("Student: 杨丰 belong to team: 8", 
+									assertEquals("Team: 555 has student: null", 
 									br.readLine());
 									license_num -= 1;
 							} 
@@ -133,7 +141,7 @@ public class MainClientTest {
 						case 3:
 							if(license_num > 0)
 							{
-								assertEquals("Student: 周杰伦 belong to team: null", 
+								assertEquals("Student: aaabb belong to team: null", 
 									br.readLine());
 								license_num -= 1;
 							}
@@ -144,11 +152,6 @@ public class MainClientTest {
 							}	
 							break;
 							
-						}
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
 						}
 					}
 				} catch (Exception e) {
@@ -167,7 +170,7 @@ public class MainClientTest {
 		};
 		
 		
-		int runnerCount = 20;
+		int runnerCount = 10;
 		// Runner数组，相当于并发多少个Client。
 		TestRunnable[] trs = new TestRunnable[runnerCount];
 
