@@ -18,7 +18,7 @@ public class PM {
     private static HashMap<String,Integer> dataMap  = new HashMap<>();
     private static int period = 1;
     private static TimeUnit periodUnit = TimeUnit.MINUTES;
-    private static int new_period = 1;
+    private static int new_period = -1;
     private static TimeUnit new_periodUnit = TimeUnit.MINUTES;
     private static String pathName = "LOG";
     private static boolean isReset = false;
@@ -39,6 +39,11 @@ public class PM {
     }
 
     public static void setPeriod(int period, TimeUnit periodUnit){
+        if(new_period==-1)
+        {
+            PM.period = period;
+            PM.periodUnit = periodUnit;
+        }
         PM.new_period = period;
         PM.new_periodUnit = periodUnit;
     }
@@ -138,7 +143,6 @@ public class PM {
             pathDir.mkdirs();
         }
         String fileName = getFileName();
-        System.out.println(fileName);
         File file = new File(pathDir, fileName);
 
         try {
