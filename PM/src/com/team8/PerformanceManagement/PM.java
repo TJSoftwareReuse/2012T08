@@ -1,188 +1,195 @@
 package com.team8.PerformanceManagement;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.TimerTask;
-import java.util.Timer;
-
-import org.omg.CORBA.PRIVATE_MEMBER;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 /**
- * @author      Group_8_Tongji_University <https://github.com/TJSoftwareReuse/2012T08>
- * @since       2015-04-24
- */
+* @author      Group_8_Tongji_University <https://github.com/TJSoftwareReuse/2012T08>
+* @since       2015-04-24
+*/
 public class PM {
-	/**
-	 * ÕâÊÇÒ»¸öµ¥Àı£¬²»Ìá¹©µ¥¶ÀµÄ¹¹Ôìº¯Êı
-	 * It's a Singleton and won't provide Constructor
-	 * Please use PM directly
-	 */
-	private PM()
-	{
-		
-	}
-	private static class SingletonHolder     
-	{     
-			public final static Map<String, Integer> instance = new HashMap<String,Integer>();
-	        public static String lastFileName=getFileName(-1);
-	        public static boolean isReset=false;
-	        public static String pathName = "LOG";
-	        public static String spilt=System.getProperty("file.separator");
-	}
-	/**
-	 * ¸ù¹ÇÊ±¼ä»ñµÃÒªĞ´ÈëµÄÎÄ¼şÃû
-	 * <p>
-	 * 2014Äê2ÔÂ29ÈÕ23·Ö   »ñÈ¡ÎÄ¼ş¸ñÊ½ : LOG\2014-02-29-23.log
-	 * ¾«È·µ½·ÖÖÓ
-	 * <p>
-	 *
-	 * @param   moreMinute   »ñµÃmoreMinuteÊ±¼äºóÒªÊä³öµÄÎÄ¼şÃû
-	 * @return  filename  moreMinuteÊ±¼äºóÒªÊä³öµÄÎÄ¼şÃû
-	 */
-	public static String getFileName(int moreMinute) {
-		Calendar calendar = Calendar.getInstance();
-		calendar.add(Calendar.MINUTE,moreMinute);
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
-		 
-		return SingletonHolder.pathName+SingletonHolder.spilt+dateFormat.format(calendar.getTime())+".log";
-		
-	}
-	
-	public static void setPathName(String pathName)
-	{
-		if(pathName!=""&&pathName!=null)
-			SingletonHolder.pathName=pathName;
-	}
-	public static String getPathName()
-	{
-		return SingletonHolder.pathName;
-	}
-	
-	/**
-	 * ·¢ËÍPMĞÅÏ¢
-	 * <p>
-	 * ·¢ËÍPMĞÅÏ¢¸øµ¥Àı£¬Ã¿´Î·¢ËÍ¼´Ê±Ğ´ÈëÎÄ¼ş
-	 * <p>
-	 * Ã¿´ÎĞ´ÈëÊÇµ±Ç°·ÖÖÓÊÕµ½µÄËùÓĞÊı¾İ
-	 * <p>
-	 * ¼ä¸ôÒ»·ÖÖÓ·¢ËÍµÄĞÅÏ¢½«»áµ÷ÓÃ getFileName(0)  »ñÈ¡ĞÂµÄÎÄ¼ş
-	 * <p>
-	 * Ìá¹©Ïß³ÌËø   Ö§³Ö¶àÏß³Ì²Ù×÷  Êä³öĞ§ÂÊ½µµÍ
-	 * <p>
-	 * Ê¹ÓÃ {{@link #getFileName(0)} »ñµÃ½«ÒªÊä³öµÄÎÄ¼şÃû
-	 * <p>
-	 * Ê¹ÓÃ {{@link #output(File)}}  Êä³ö¸Ã·ÖÖÓÄÚÊÕµ½µÄÈ«²¿ĞÅÏ¢
-	 * <p>
-	 * ÒòÎªÃ¿´ÎĞ´ÈëÊÇ½øĞĞĞ´¸²¸Ç£¬ËùÒÔ×î»µÇé¿öÏÂÊ±¼ä¸´ÔÓ¶ÈÊÇO(n^2)
-	 * <p>
-	 * Ã¿´Îµ÷ÓÃ¸Ãº¯Êı£¬¼´Ê±Êä³öµ½ÎÄ¼ş£¬È·±£³ÌĞò¾¡¿ÉÄÜÊä³öPMĞÅÏ¢
-	 * <p>
-	 * @param  name   PMĞÅÏ¢µÄ×Ö·ûÃèÊö
-	 * @param  value    PMĞÅÏ¢µÄÊä³ö´ÎÊı     value>0
-	 * @exception  IOException  
-	 */
-	public synchronized static void sendPMMessage(String name,int value)
-	{
-		if(value<=0)return;
-		String FileName=getFileName(0);
-		File file=new File(FileName);
+    private static HashMap<String,Integer> dataMap  = new HashMap<>();
+    private static int period = 1;
+    private static TimeUnit periodUnit = TimeUnit.MINUTES;
+    private static int new_period = 1;
+    private static TimeUnit new_periodUnit = TimeUnit.MINUTES;
+    private static String pathName = "LOG";
+    private static boolean isReset = false;
+    private static Date startDate = new Date();
+    private static Date endDate = new Date(startDate.getTime() + periodUnit.toMillis(period));
 
-		try {
-			if(!file.getParentFile().exists())
-			{	
-				file.getParentFile().mkdirs();
-			}
-			if(FileName.equals(SingletonHolder.lastFileName))
-			{
-				if(SingletonHolder.instance.containsKey(name))
-					SingletonHolder.instance.put(name, value+SingletonHolder.instance.get(name));
-				else {
-					SingletonHolder.instance.put(name, value);
-				}
-			}
-			else {
-				SingletonHolder.lastFileName=FileName;
-				SingletonHolder.instance.clear();
-				SingletonHolder.instance.put(name, value);
-				file.createNewFile();
 
-			}
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		output(file);
-	}
-	/**
-	 * Ë½ÓĞº¯Êı£ºÊä³ö¸Ã·ÖÖÓÄÚÊÕµ½µÄĞÅÏ¢
-	 * <p>
-	 * ½«¸Ã·ÖÖÓÄÚÊÕµ½µÄĞÅÏ¢Êä³öµ½fileÎÄ¼şÏÂ
-	 * ÕâÊÇÄÚ²¿Ë½ÓĞº¯Êı ½ö¹¥ÀàÄÚ²¿Êä³öÊ¹ÓÃ
-	 * <p>
-	 * @param file  Êä³öµ½¸ÃÎÄ¼ş¶ÔÏó ÇëÈ·±£ÎÄ¼şÒÑ¾­Éú³É
-	 * @exception IOException
-	 */
-	private static synchronized void output(File file) {
-		FileOutputStream out;
-		try {
-			out = new FileOutputStream(file);
-			PrintWriter pw = new PrintWriter(new OutputStreamWriter(out));
-			for (String key: (SingletonHolder.instance).keySet()) {
-				pw.println(key+":"+SingletonHolder.instance.get(key).toString());
-			}  
-			pw.flush();
-			pw.close();
-			out.close();
-			SingletonHolder.isReset=false;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-	}
-	/**
-	 * ·µ»Ø¸Ã·ÖÖÓÄÚÊÕµ½µÄĞÅÏ¢
-	 * <p>
-	 * ½«ÀàÄÚ²¿±£´æµÄĞÅÏ¢Í¨¹ıMap·½Ê½·µ»Ø
-	 * ¸Ã·½·¨ÊÇÎªÁË·½±ã²âÊÔÈËÔ±½øĞĞ²âÊÔ
-	 * <p>
-	 * @exception IOException
-	 * @return  Map  PMĞÅÏ¢ºÍÊä³ö´ÎÊıµÄ¶ÔÓ¦±í
-	 */
-	public static Map<String, Integer> getMap()
-	{
-		return SingletonHolder.instance;
-	}
-	/**
-	 * ·µ»Ø¸Ã·ÖÖÓÄÚÊÕµ½µÄĞÅÏ¢
-	 * <p>
-	 * ÖØÖÃ¸ÃÀà
-	 * Çå¿Õ¸Ã·ÖÖÓµÄÊä³ö¼ÇÂ¼
-	 * ¸Ã·½·¨ÊÇÎªÁË·½±ã²âÊÔÈËÔ±½øĞĞ²âÊÔ
-	 * <p>
-	 */
-	public static void Reset()
-	{
-		if(SingletonHolder.isReset==false)
-		{
-			SingletonHolder.isReset=true;
-			System.gc();//ÎªÁË±£Ö¤ÎÄ¼şÄÜ¹»Õı³£É¾³ı£¬ĞèÒªÕâ¸öº¯Êı
-			SingletonHolder.instance.clear();
-			File lastFile=new File(getFileName(0));
-			if(lastFile.exists())
-				lastFile.delete();
-			SingletonHolder.lastFileName=getFileName(-1);
-		}
-	}
+
+    public static void setPathName(String name){
+        if(name!=null&&!name.equals(""))
+        {
+            pathName=name;
+        }
+    }
+
+    public static void setPeriod(int period){
+        setPeriod(period, TimeUnit.MINUTES);
+    }
+
+    public static void setPeriod(int period, TimeUnit periodUnit){
+        PM.new_period = period;
+        PM.new_periodUnit = periodUnit;
+    }
+
+
+    /**
+     * å‘é€PMä¿¡æ¯
+     * <p>
+     * å‘é€PMä¿¡æ¯ç»™å•ä¾‹ï¼Œæ¯æ¬¡å‘é€å³æ—¶å†™å…¥æ–‡ä»¶
+     * <p>
+     * æ¯æ¬¡å†™å…¥æ˜¯å½“å‰åˆ†é’Ÿæ”¶åˆ°çš„æ‰€æœ‰æ•°æ®
+     * <p>
+     * é—´éš”ä¸€åˆ†é’Ÿå‘é€çš„ä¿¡æ¯å°†ä¼šè°ƒç”¨ getFileName(0)  è·å–æ–°çš„æ–‡ä»¶
+     * <p>
+     * æä¾›çº¿ç¨‹é”   æ”¯æŒå¤šçº¿ç¨‹æ“ä½œ  è¾“å‡ºæ•ˆç‡é™ä½
+     * <p>
+     * ä½¿ç”¨ {{@link #getFileName()} è·å¾—å°†è¦è¾“å‡ºçš„æ–‡ä»¶å
+     * <p>
+     * ä½¿ç”¨ {{@link #output()}}  è¾“å‡ºè¯¥åˆ†é’Ÿå†…æ”¶åˆ°çš„å…¨éƒ¨ä¿¡æ¯
+     * <p>
+     * å› ä¸ºæ¯æ¬¡å†™å…¥æ˜¯è¿›è¡Œå†™è¦†ç›–ï¼Œæ‰€ä»¥æœ€åæƒ…å†µä¸‹æ—¶é—´å¤æ‚åº¦æ˜¯O(n^2)
+     * <p>
+     * æ¯æ¬¡è°ƒç”¨è¯¥å‡½æ•°ï¼Œå³æ—¶è¾“å‡ºåˆ°æ–‡ä»¶ï¼Œç¡®ä¿ç¨‹åºå°½å¯èƒ½è¾“å‡ºPMä¿¡æ¯
+     * <p>
+     * @param  name   PMä¿¡æ¯çš„å­—ç¬¦æè¿°
+     * @param  value    PMä¿¡æ¯çš„è¾“å‡ºæ¬¡æ•°     value>0
+     * @exception  IOException
+     */
+    public synchronized static void sendPMMessage(String name,int value){
+        if(value < 0){
+            return;
+        }
+        updatePerformanceData(name, value);
+        if(!dataMap.isEmpty()) {
+            output();
+        }
+    }
+
+    private static void updatePerformanceData(String indexName, int value){
+        if(endDate.getTime()<new Date().getTime()){
+            dataMap.clear();
+        }
+        if(dataMap.get(indexName)!=null){
+            value += dataMap.get(indexName);
+        }
+        dataMap.put(indexName, value);
+    }
+
+    private static boolean isSameDay(Date date1, Date date2){
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
+        return fmt.format(date1).equals(fmt.format(date2));
+    }
+
+    /**
+     * æ ¹æ®æ—¶é—´è·å¾—è¦å†™å…¥çš„æ–‡ä»¶å
+     * <p>
+     * 2014å¹´2æœˆ29æ—¥23åˆ†   è·å–æ–‡ä»¶æ ¼å¼ : LOG\2014-02-29-23.log
+     * ç²¾ç¡®åˆ°åˆ†é’Ÿ
+     * <p>
+     *
+     * @return  filename  moreMinuteæ—¶é—´åè¦è¾“å‡ºçš„æ–‡ä»¶å
+     */
+    public static String getFileName() {
+        Date date = new Date();
+        if (date.getTime() > endDate.getTime()) {
+            periodUnit = new_periodUnit;
+            period = new_period;
+            startDate = new Date(endDate.getTime() + ((date.getTime() - endDate.getTime())/periodUnit.toMillis(period))*periodUnit.toMillis(period));
+            endDate = new Date(startDate.getTime() + periodUnit.toMillis(period));
+        }
+        SimpleDateFormat startDateFmt = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+        SimpleDateFormat endDateFmt;
+        if(isSameDay(startDate, endDate))
+        {
+            endDateFmt = new SimpleDateFormat("HH-mm-ss");
+        }
+        else
+        {
+            endDateFmt = startDateFmt;
+        }
+        return startDateFmt.format(startDate)+" to "+endDateFmt.format(endDate);
+    }
+
+
+
+    /**
+     * ç§æœ‰å‡½æ•°ï¼šè¾“å‡ºè¯¥åˆ†é’Ÿå†…æ”¶åˆ°çš„ä¿¡æ¯
+     * <p>
+     * å°†è¯¥åˆ†é’Ÿå†…æ”¶åˆ°çš„ä¿¡æ¯è¾“å‡ºåˆ°fileæ–‡ä»¶ä¸‹
+     * è¿™æ˜¯å†…éƒ¨ç§æœ‰å‡½æ•° ä»…æ”»ç±»å†…éƒ¨è¾“å‡ºä½¿ç”¨
+     * <p>
+     */
+    private static synchronized void output() {
+        File pathDir = new File(pathName);
+        if(!pathDir.exists())
+        {
+            pathDir.mkdirs();
+        }
+        String fileName = getFileName();
+        System.out.println(fileName);
+        File file = new File(pathDir, fileName);
+
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            PrintWriter pw = new PrintWriter(new OutputStreamWriter(out));
+            for (String key: dataMap.keySet()) {
+                pw.println(key+":"+dataMap.get(key).toString());
+            }
+            pw.flush();
+            pw.close();
+            out.close();
+            isReset=false;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * æ¸…ç©ºè¾“å‡ºæ–‡ä»¶
+     * <p>
+     * é‡ç½®è¯¥ç±»
+     * æ¸…ç©ºè¯¥åˆ†é’Ÿçš„è¾“å‡ºè®°å½•
+     * è¯¥æ–¹æ³•æ˜¯ä¸ºäº†æ–¹ä¾¿æµ‹è¯•äººå‘˜è¿›è¡Œæµ‹è¯•
+     * <p>
+     */
+    public static void Reset(){
+        if(!isReset)
+        {
+            isReset=true;
+            System.gc();//ä¸ºäº†ä¿è¯æ–‡ä»¶èƒ½å¤Ÿæ­£å¸¸åˆ é™¤ï¼Œéœ€è¦è¿™ä¸ªå‡½æ•°
+            dataMap.clear();
+            File lastFile=new File(getFileName());
+            if(lastFile.exists())
+                lastFile.delete();
+        }
+    }
+
+    /**
+     * è¿”å›è¯¥åˆ†é’Ÿå†…æ”¶åˆ°çš„ä¿¡æ¯
+     * <p>
+     * å°†ç±»å†…éƒ¨ä¿å­˜çš„ä¿¡æ¯é€šè¿‡Mapæ–¹å¼è¿”å›
+     * è¯¥æ–¹æ³•æ˜¯ä¸ºäº†æ–¹ä¾¿æµ‹è¯•äººå‘˜è¿›è¡Œæµ‹è¯•
+     * <p>
+     * @exception IOException
+     * @return  Map  PMä¿¡æ¯å’Œè¾“å‡ºæ¬¡æ•°çš„å¯¹åº”è¡¨
+     */
+    public static Map<String, Integer> getMap(){
+        return dataMap;
+    }
+
 }
 
 
