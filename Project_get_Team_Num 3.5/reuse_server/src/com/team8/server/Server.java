@@ -18,9 +18,7 @@ public class Server {
     public enum ServiceType {
         TEAM,STUDENT,BOTH
     }
-    private enum ServiceStatus{
-        SUCCESS, FAIL
-    }
+
 
     public static int PORT = 8080;
     public static String CMRoot="CMRoot/config.properties";
@@ -77,6 +75,7 @@ public class Server {
         {
             FailureManager.resetOutputFile(ConfigUtil.getInstance().getProperty("FMRoot"));
         }
+        FailureManager.setRepetation(false);
     }
 
     private static void initServiceType() {
@@ -236,7 +235,7 @@ public class Server {
             if(license.inLicense())
             {
 
-                FM.output(ServiceStatus.SUCCESS);
+                FailureManager.logInfo("Provide Service Success");
                 PM.sendPMMessage("Provide Service "+str, 1);
                 PM.sendPMMessage("Return Message", 1);
 
@@ -255,7 +254,7 @@ public class Server {
                 pw.flush();
             }
             else {
-                FM.output(ServiceStatus.FAIL);
+                FailureManager.logInfo("Provide Service Fail");
                 PM.sendPMMessage("Reject Service "+str, 1);
                 PM.sendPMMessage("Return Message", 1);
                 pw.println("Reject Service");
@@ -280,33 +279,6 @@ public class Server {
             }
         }
 
-    }
-
-
-    private static class FM {
-
-
-
-        private static ServiceStatus lastStatus;
-
-        public static void output(ServiceStatus status)
-        {
-            if(status!=lastStatus)
-            {
-                if(status==ServiceStatus.SUCCESS)
-                {
-                    FailureManager.logInfo("Provide Service Success");
-                }
-                else if(status==ServiceStatus.FAIL)
-                {
-                    FailureManager.logInfo("Provide Service Fail");
-                }
-
-                lastStatus = status;
-            }
-
-
-        }
     }
 
 
